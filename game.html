@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test</title>
+    <link rel="icon" href="./icon.ico">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <style>
+        canvas {
+            margin-left: 23%;
+            margin-top: 5%;
+            cursor: url(thietimeforreal.ico) auto;
+        }
+        
+        html,
+        body {
+            height: 100%;
+            background-image: url('./background.jpg');
+			overflow: hidden;
+        }
+        
+        .wrap {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+		@font-face {
+			font-family: 'game-font';
+			src: url('./Pixel.ttf');
+		}
+		
+		button {
+			width:200px;
+			height: 200px;
+			margin-top: 20%;
+		}
+		
+		img {
+			width: 200px;
+			height: 200px;
+		}
+    </style>
+</head>
+
+<body>
+    TESTIN GAME
+    <audio autoplay>
+        <source src="./Pokemon_Sword_Shield_OST_-_Gym_Leader_Battle_Full_In-Game_Version-quYjN57Tycg.mp3" type="audio/mp3">
+    </audio>
+	<div class="d-flex flex-row">
+		<button class="btn p-1 m-2" id="pause">
+			<img src="./pause-button.png" id="pause-img">
+		</button>
+		<canvas width="800" height="800" id="game"></canvas>
+    </div>
+	<div class="wrap">
+    </div>
+
+    <script>
+        var player1 = 0;
+        var player2 = 0;
+        var otherSide = document.querySelector('.button')
+        var canvas;
+        var canvasContext;
+        var ballX = 400;
+        let height = document.getElementById("game").height
+        var ballY = Math.floor(Math.random() * height);
+        var ballSpeedY = 15;
+        var FPS = 30;
+        var ballSpeedX = 15;
+
+        var paddleY = 210;
+        var paddleYY = 210;
+        const paddleheight = 100;
+		/// store key codes and currently pressed ones
+		var keys = {};
+		keys.UP = 38;
+		keys.LEFT = 37;
+		keys.RIGHT = 39;
+		keys.DOWN = 40;
+		
+		var inGame = true;
+		//paddle speed
+		var speed = 2;
+        function mouseMovement(evt) {
+            var rect = canvas.getBoundingClientRect();
+            var root = document.documentElement;
+            var mouseX = evt.clientX - rect.left - root.scrollLeft;
+            var mouseY = evt.clientY - rect.top - root.scrollTop;
+            return {
+                x: mouseX,
+                y: mouseY
+            };
+            switchSide();
+        }
+
+		//Pause game feature
+		let pause = document.getElementById('pause');
+		let img = document.getElementById('pause-img');
+			pause.addEventListener('click', (e) => {
+				if (inGame) {
+					inGame = false;
+					img.src = "./pause-button-reset.png";
+					console.log('Game paused');
+				}
+				else {
+					inGame = true;
+					img.src = "./pause-button.png";
+					console.log('Game back in progress');
+				}
+			});
+
+		// Main game loop
+        window.onload = function() {
+            canvas = document.getElementById("game");
+            canvasContext = canvas.getContext('2d');
+			console.log(inGame);
+				setInterval(function() {
+					if (inGame == true) 
+					{
+						moveEverything();
+						drawEverything();
+					}
+					else if (inGame == false)
+					{
+						canvasContext.font = "50px game-font";
+						canvasContext.fillText("PAUSE", (canvas.width / 2)-50, canvas.height/2);
+					}
+				}, 1000 / FPS);
+            canvas.addEventListener('mousemove',
+                function(evt) {
+                    var mousePos = mouseMovement(evt);
+                    paddleY = ( mousePos.y);
+                }
+
+            )
+        }
+
+        function drawEverything() {
+            draw(0, 0, canvas.width, canvas.height, 'black');
+            draw(35, paddleY, 100, 10, 'white');
+            drawCircle(ballX, ballY, 10, 'yellow');
+            draw(770, paddleYY, 100, 10, "white")
+            canvasContext.font = "30px game-font";
+            canvasContext.fillText("player 1 (you) |", (canvas.width / 2) - 150, 70);
+            canvasContext.fillText(player1, (canvas.width / 2) - 50, 100);
+            canvasContext.fillText("player 2", (canvas.width / 2) + 30, 70);
+            canvasContext.fillText(player2, (canvas.width / 2) + 50, 100);
+        }
+
+        function draw(x, y, height, width, color) {
+            canvasContext.fillStyle = color;
+            canvasContext.fillRect(x, y, width, height);
+        }
+
+        function drawCircle(x, y, radius, color) {
+            canvasContext.fillStyle = color;
+            canvasContext.beginPath();
+            canvasContext.arc(x, y, radius, 0, Math.PI * 2, true);
+            canvasContext.fill();
+        }
+
+
+        function ballReset1() {
+            ballSpeedX = -ballSpeedX;
+            ballX = canvas.width / 3;
+            ballY = Math.floor(Math.random() * 600);
+        }
+
+        function ballReset2() {
+            ballSpeedX = -ballSpeedX;
+            ballX = canvas.width / 1.5;
+            ballY = Math.floor(Math.random() * 600);
+        }
+
+        function moveEverything() {
+            //monkey();
+            //monkey1();
+            ndPlayer();
+            ballX = ballX + ballSpeedX;
+            ballY = ballY + ballSpeedY;
+            if (ballX < 5) {
+                if (ballY > paddleY &&
+                    ballY < paddleY + paddleheight) {
+                    ballSpeedX = -ballSpeedX;
+                } else {
+                    ballReset1();
+                    player2++;
+                    console.log('player2 score -> ', player2);
+                }
+            }
+            if (ballX > canvas.width) {
+                if (ballY > paddleYY &&
+                    ballY < paddleYY + paddleheight) {
+                    ballSpeedX = -ballSpeedX;
+                } else {
+                    ballReset2();
+                    player1++;
+                    console.log('player1 score -> ', player1);
+                }
+            }
+
+            if (ballY < 0) {
+                ballSpeedY = -ballSpeedY;
+            }
+
+            if (ballY > canvas.height) {
+                ballSpeedY = -ballSpeedY;
+            }
+        }
+
+        function monkey() {
+            var paddleYYCenter = paddleYY + paddleheight / 2;
+            if (paddleYYCenter < ballY - 30) {
+                paddleYY += 32;
+            } else if (paddleYYCenter > ballY + 30) {
+                paddleYY -= 32;
+            }
+        }
+        //player button movement
+
+        function ndPlayer() {
+            let botY = paddleYY;
+			document.body.onkeyup =
+			document.body.onkeydown = function(e) {
+				if (e.preventDefault) {
+					e.preventDefault();
+				} else {
+					e.returnValue = false;
+				}
+				var kc = e.keyCode || e.which;
+				keys[kc] = e.type == 'keydown';
+			};
+			if (keys[keys.UP]) {
+				paddleYY = botY + 10*speed;
+				console.log(paddleYY);
+                document.body.style.overflow = 'hidden';			
+			}
+			if (keys[keys.DOWN]) {
+				paddleYY = botY - 10*speed;
+				console.log(paddleYY);
+                document.body.style.overflow = 'hidden';
+			}
+        }
+
+		/*
+        function monkey1() {
+            var paddleYCenter = paddleY + paddleheight / 2;
+            if (paddleYCenter < ballY - 30) {
+                paddleY += 25;
+            } else if (paddleYCenter > ballY + 30) {
+                paddleY -= 22;
+            }
+        }
+		*/
+    </script>
+
+</body>
+
+</html>
