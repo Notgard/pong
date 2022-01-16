@@ -49,9 +49,6 @@
 
 <body>
     TESTIN GAME
-    <audio autoplay>
-        <source src="./Pokemon_Sword_Shield_OST_-_Gym_Leader_Battle_Full_In-Game_Version-quYjN57Tycg.mp3" type="audio/mp3">
-    </audio>
 	<div class="d-flex flex-row">
 		<button class="btn p-1 m-2" id="pause">
 			<img src="./pause-button.png" id="pause-img">
@@ -70,14 +67,14 @@
         var ballX = 400;
         let height = document.getElementById("game").height
         var ballY = Math.floor(Math.random() * height);
-        var ballSpeedY = 15;
+        var ballSpeedY = 30;
         var FPS = 30;
         var ballSpeedX = 15;
 
         var paddleY = 210;
         var paddleYY = 210;
         const paddleheight = 100;
-		/// store key codes and currently pressed ones
+		/// Store key codes and currently pressed ones
 		var keys = {};
 		keys.UP = 38;
 		keys.LEFT = 37;
@@ -86,7 +83,13 @@
 		
 		var inGame = true;
 		//paddle speed
-		var speed = 2;
+		var speed = 3;
+        const paddleSound = new Audio('./SFX/paddleSound.mp3');
+        const scoreSound = new Audio('./SFX/pointScored.mp3');
+        const pauseSound = new Audio('./SFX/pause.mp3');
+
+        // Loading game sounds...
+        var loadSound = function (sound) {};
         function mouseMovement(evt) {
             var rect = canvas.getBoundingClientRect();
             var root = document.documentElement;
@@ -104,6 +107,7 @@
 		let img = document.getElementById('pause-img');
 			pause.addEventListener('click', (e) => {
 				if (inGame) {
+                    pauseSound.play();
 					inGame = false;
 					img.src = "./pause-button-reset.png";
 					console.log('Game paused');
@@ -151,6 +155,9 @@
             canvasContext.fillText(player1, (canvas.width / 2) - 50, 100);
             canvasContext.fillText("player 2", (canvas.width / 2) + 30, 70);
             canvasContext.fillText(player2, (canvas.width / 2) + 50, 100);
+            canvasContext.font = "30px game-font";
+            canvasContext.fillStyle = "#ff0000";
+            canvasContext.fillText("Click anywhere to activate sounds :)", (canvas.width / 2)-200, canvas.height - 15);
         }
 
         function draw(x, y, height, width, color) {
@@ -179,16 +186,18 @@
         }
 
         function moveEverything() {
-            //monkey();
-            //monkey1();
-            ndPlayer();
+            monkey();
+            monkey1();
+            //ndPlayer();
             ballX = ballX + ballSpeedX;
             ballY = ballY + ballSpeedY;
             if (ballX < 5) {
                 if (ballY > paddleY &&
                     ballY < paddleY + paddleheight) {
+                    paddleSound.play();
                     ballSpeedX = -ballSpeedX;
                 } else {
+                    scoreSound.play();
                     ballReset1();
                     player2++;
                     console.log('player2 score -> ', player2);
@@ -197,8 +206,10 @@
             if (ballX > canvas.width) {
                 if (ballY > paddleYY &&
                     ballY < paddleYY + paddleheight) {
+                    paddleSound.play();
                     ballSpeedX = -ballSpeedX;
                 } else {
+                    scoreSound.play();
                     ballReset2();
                     player1++;
                     console.log('player1 score -> ', player1);
@@ -215,11 +226,20 @@
         }
 
         function monkey() {
+            var paddleYCenter = paddleY + paddleheight / 2;
+            if (paddleYCenter < ballY - 30) {
+                paddleY += 15*speed;
+            } else if (paddleYCenter > ballY + 30) {
+                paddleY -= 15*speed;
+            }
+        }
+
+        function monkey1() {
             var paddleYYCenter = paddleYY + paddleheight / 2;
             if (paddleYYCenter < ballY - 30) {
-                paddleYY += 32;
+                paddleYY += 10*speed;
             } else if (paddleYYCenter > ballY + 30) {
-                paddleYY -= 32;
+                paddleYY -= 10*speed;
             }
         }
         //player button movement
@@ -237,27 +257,16 @@
 				keys[kc] = e.type == 'keydown';
 			};
 			if (keys[keys.UP]) {
-				paddleYY = botY + 10*speed;
+				paddleYY = botY - 10*speed;
 				console.log(paddleYY);
                 document.body.style.overflow = 'hidden';			
 			}
 			if (keys[keys.DOWN]) {
-				paddleYY = botY - 10*speed;
+				paddleYY = botY + 10*speed;
 				console.log(paddleYY);
                 document.body.style.overflow = 'hidden';
 			}
         }
-
-		/*
-        function monkey1() {
-            var paddleYCenter = paddleY + paddleheight / 2;
-            if (paddleYCenter < ballY - 30) {
-                paddleY += 25;
-            } else if (paddleYCenter > ballY + 30) {
-                paddleY -= 22;
-            }
-        }
-		*/
     </script>
 
 </body>
