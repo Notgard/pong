@@ -59,11 +59,13 @@
     </div>
 
     <script>
+        // Player score's
         var player1 = 0;
         var player2 = 0;
-        var otherSide = document.querySelector('.button')
+
         var canvas;
         var canvasContext;
+
         var ballX = 400;
         let height = document.getElementById("game").height
         var ballY = Math.floor(Math.random() * height);
@@ -74,6 +76,10 @@
         var paddleY = 210;
         var paddleYY = 210;
         const paddleheight = 100;
+
+		//paddle speed
+		var speed = 3;
+        
 		/// Store key codes and currently pressed ones
 		var keys = {};
 		keys.UP = 38;
@@ -82,14 +88,11 @@
 		keys.DOWN = 40;
 		
 		var inGame = true;
-		//paddle speed
-		var speed = 3;
+
         const paddleSound = new Audio('./SFX/paddleSound.mp3');
         const scoreSound = new Audio('./SFX/pointScored.mp3');
         const pauseSound = new Audio('./SFX/pause.mp3');
 
-        // Loading game sounds...
-        var loadSound = function (sound) {};
         function mouseMovement(evt) {
             var rect = canvas.getBoundingClientRect();
             var root = document.documentElement;
@@ -146,10 +149,15 @@
         }
 
         function drawEverything() {
+            //background
             draw(0, 0, canvas.width, canvas.height, 'black');
+            // Left Paddle
             draw(35, paddleY, 100, 10, 'white');
+            // Ball
             drawCircle(ballX, ballY, 10, 'yellow');
+            // Right Paddle
             draw(770, paddleYY, 100, 10, "white")
+            // Game context
             canvasContext.font = "30px game-font";
             canvasContext.fillText("player 1 (you) |", (canvas.width / 2) - 150, 70);
             canvasContext.fillText(player1, (canvas.width / 2) - 50, 100);
@@ -225,6 +233,7 @@
             }
         }
 
+        // Player 1 artificial intelligence function
         function monkey() {
             var paddleYCenter = paddleY + paddleheight / 2;
             if (paddleYCenter < ballY - 30) {
@@ -234,6 +243,7 @@
             }
         }
 
+        // Player 2 artificial intelligence function
         function monkey1() {
             var paddleYYCenter = paddleYY + paddleheight / 2;
             if (paddleYYCenter < ballY - 30) {
@@ -242,10 +252,11 @@
                 paddleYY -= 10*speed;
             }
         }
-        //player button movement
 
+        //player button arrow-key based movement
         function ndPlayer() {
             let botY = paddleYY;
+            // Updates current key
 			document.body.onkeyup =
 			document.body.onkeydown = function(e) {
 				if (e.preventDefault) {
@@ -256,15 +267,15 @@
 				var kc = e.keyCode || e.which;
 				keys[kc] = e.type == 'keydown';
 			};
+            // Key event listner 
+            //(switched from switch case because of keyboard navigation being much slower :( )
 			if (keys[keys.UP]) {
 				paddleYY = botY - 10*speed;
-				console.log(paddleYY);
-                document.body.style.overflow = 'hidden';			
+				console.log(paddleYY);			
 			}
 			if (keys[keys.DOWN]) {
 				paddleYY = botY + 10*speed;
 				console.log(paddleYY);
-                document.body.style.overflow = 'hidden';
 			}
         }
     </script>
